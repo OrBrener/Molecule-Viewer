@@ -11,7 +11,7 @@ import os
 class Database():
 
     def __init__( self, reset = False ):
-        # if reset it true: delete the exisiting database and start a new one
+        # if reset it true: delete the existing database and start a new one
         if reset:
             if os.path.exists( 'molecules.db' ):
                 os.remove( 'molecules.db' )
@@ -85,11 +85,11 @@ class Database():
         self.conn.execute( """INSERT INTO Atoms ( ELEMENT_CODE, X, Y, Z ) VALUES ('%s', %s, %s, %s);""" % (atom.element, atom.x, atom.y, atom.z) )
         
         # extract the atomId from Atoms table
-        atomId = self.conn.execute("""SELECT MAX(ATOM_ID) FROM Atoms WHERE( ELEMENT_CODE, X, Y, Z ) = ('%s', %s, %s, %s);""" % (atom.element, atom.x, atom.y, atom.z) ).fetchall()[0][0]
-        # exttact the moleculeId of the molecule
+        atomId = self.conn.execute("""SELECT MAX (ATOM_ID) FROM Atoms;""" ).fetchall()[0][0]
+        # extract the moleculeId of the molecule
         moleculeId = self.conn.execute("""SELECT MOLECULE_ID FROM Molecules WHERE NAME = '%s';""" % (molname) ).fetchall()[0][0]
         
-        # insert the molecule and atom Id into thhe MoleculeAtom table
+        # insert the molecule and atom Id into the MoleculeAtom table
         self.conn.execute("""INSERT INTO MoleculeAtom ( MOLECULE_ID, ATOM_ID ) VALUES (%s, %s);""" % (moleculeId, atomId) )
         
         # Save all the changes to the database
@@ -102,11 +102,11 @@ class Database():
         self.conn.execute( """INSERT INTO Bonds ( A1, A2, EPAIRS ) VALUES (%s, %s, %s);""" % (bond.a1, bond.a2, bond.epairs) )
         
         # extract the bondId from Bonds table
-        bondId = self.conn.execute("""SELECT BOND_ID FROM Bonds WHERE ( A1, A2, EPAIRS ) = (%s, %s, %s);""" % (bond.a1, bond.a2, bond.epairs) ).fetchall()[0][0]
-        # exttact the moleculeId of the molecule
+        bondId = self.conn.execute("""SELECT BOND_ID, MAX (BOND_ID) FROM Bonds;""" ).fetchall()[0][0]
+        # extract the moleculeId of the molecule
         moleculeId = self.conn.execute("""SELECT MOLECULE_ID FROM Molecules WHERE NAME = '%s';""" % (molname) ).fetchall()[0][0]
         
-        # insert the molecule and bond Id into thhe MoleculeBond table
+        # insert the molecule and bond Id into the MoleculeBond table
         self.conn.execute( """INSERT INTO MoleculeBond ( MOLECULE_ID, BOND_ID ) VALUES (%s, %s);""" % (moleculeId, bondId) )
         
         # Save all the changes to the database
@@ -140,7 +140,7 @@ class Database():
 
     def load_mol( self, name ):
         # get a molecule from the database
-        # retrives all atoms and bonds of the molecule = name, and appends them to a Molecule() and return it
+        # retrieves all atoms and bonds of the molecule = name, and appends them to a Molecule() and return it
 
         # create a molecule
         mol = Molecule()
@@ -203,57 +203,12 @@ class Database():
 
         # for each element in the database:
         for i in range (len(data)):
-            # add a radialGradent svg string (with it's data)
+            # add a radialGradient svg string (with it's data)
             radialGradientSVG += """<radialGradient id="%s" cx="-50%%" cy="-50%%" r="220%%" fx="20%%" fy="20%%">
             <stop offset="0%%" stop-color="#%s"/>
             <stop offset="50%%" stop-color="#%s"/>
             <stop offset="100%%" stop-color="#%s"/>
             </radialGradient>\n """ % (data[i][0],data[i][1],data[i][2],data[i][3])
 
-        # return the concatinated string of radialGradients for all elements
+        # return the concatenated string of radialGradients for all elements
         return radialGradientSVG
-
-if __name__ == "__main__":
-    db = Database(reset=True)
-    db.create_tables()
-
-    db['Elements'] = ( 1, 'H', 'Hydrogen', 'FFFFFF', '050505', '020202', 25 )
-    db['Elements'] = ( 6, 'C', 'Carbon', '808080', '010101', '000000', 40 )
-    db['Elements'] = ( 7, 'N', 'Nitrogen', '0000FF', '000005', '000002', 40 )
-    db['Elements'] = ( 8, 'O', 'Oxygen', 'FF0000', '050000', '020000', 40 )
-
-    fp = open( 'water-3D-structure-CT1000292221.sdf' )
-    db.add_molecule( 'Water', fp )
-
-    fp = open( 'caffeine-3D-structure-CT1001987571.sdf' )
-    db.add_molecule( 'Caffeine', fp )
-
-    fp = open( 'CID_31260.sdf' )
-    db.add_molecule( 'Isopentanol', fp )
-
-    # display tables
-    print("Elements")
-    print( db.conn.execute( "SELECT * FROM Elements;" ).fetchall() )
-    print("\n\nMolecules")
-    print( db.conn.execute( "SELECT * FROM Molecules;" ).fetchall() )
-    print("\n\nAtoms")
-    print( db.conn.execute( "SELECT * FROM Atoms;" ).fetchall() )
-    print("\n\nBonds")
-    print( db.conn.execute( "SELECT * FROM Bonds;" ).fetchall() )
-    print("\n\nMoleculeAtom")
-    print( db.conn.execute( "SELECT * FROM MoleculeAtom;" ).fetchall() )
-    print("\n\nMoleculeBond")
-    print( db.conn.execute( "SELECT * FROM MoleculeBond;" ).fetchall())
-
-
-# if __name__ == "__main__":
-    db = Database(reset=False) # or use default
-    MolDisplay.radius = db.radius()
-    MolDisplay.element_name = db.element_name()
-    MolDisplay.header += db.radial_gradients()
-    for molecule in [ 'Water', 'Caffeine', 'Isopentanol' ]:
-        mol = db.load_mol( molecule )
-        mol.sort()
-        fp = open( molecule + ".svg", "w" )
-        fp.write( mol.svg() )
-        fp.close()
