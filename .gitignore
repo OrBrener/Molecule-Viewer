@@ -1,0 +1,11 @@
+A3 Code
+given
+ExpectedOutputs
+*.o 
+*.so
+*.svg
+*.sdf
+*.db
+__pycache__
+output.txt
+.vscode
