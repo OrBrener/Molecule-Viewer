@@ -440,3 +440,15 @@ void mol_xform( molecule *molecule, xform_matrix matrix ) {
     }
 
 }
+
+rotations *spin( molecule *mol ) {
+    rotations* r = NULL;
+
+    return r;
+
+}
+
+void rotationsfree( rotations *rotations ) {
+
+    // todo
+}
