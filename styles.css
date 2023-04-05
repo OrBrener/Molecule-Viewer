@@ -1,0 +1,59 @@
+* {
+    padding: 5px;
+}
+
+body {
+    background-color: #9BC5DB;
+}
+
+img {
+    max-width: 25% !important;
+    border: 5px solid rgb(85, 84, 84);
+}
+
+.bg-light {
+    background-color: #99A3E8 !important;
+}
+
+nav {
+    font-size: 25px !important; 
+}
+
+.navbar-brand {
+    font-size: 35px !important;
+}
+
+.display-1, .lead {
+    color: rgb(85, 84, 84) !important;
+}
+
+.index {
+    text-align: center !important;
+    margin-top: 50px !important;
+}
+
+.accordion, .card {
+    background-color: #9BC5DB !important;
+    border-color: black;
+}
+
+.btn-link {
+    background-color: #61bbeb !important;
+    border: 3px solid #2197d6;
+    padding: 3% !important;
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;    
+}
+
+.custom-file {
+    width: 30% !important;
+    height: 50% !important;
+    margin-top: 10% !important;  
+}
+
+.table {
+    margin-top: 10% !important;
+    margin-left: 15% !important;
+    width: 70% !important;
+}
