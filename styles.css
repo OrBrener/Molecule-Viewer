@@ -46,10 +46,8 @@ nav {
     margin-right: auto !important;    
 }
 
-.custom-file {
-    width: 30% !important;
-    height: 50% !important;
-    margin-top: 10% !important;  
+.upload {
+    margin-top: 5% !important;  
 }
 
 .table {

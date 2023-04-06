@@ -4,75 +4,135 @@
 # Student #: 1140102
 
 import MolDisplay
+from molsql import Database
 import sys
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import io
+import urllib
+import json
+import cgi
+
+# public_files = [ '/index.html', '/style.css', '/script.js' ]
+
+db = Database(reset=True)
+db.create_tables()
 
 class MyHandler( BaseHTTPRequestHandler ):
 
     def do_GET( self ):
-        if self.path == "/":
+
+        if self.path == '/' or self.path.endswith( '.html' ):
             self.send_response( 200 ); # OK
             self.send_header( "Content-type", "text/html" )
-            self.send_header( "Content-length", len(web_form) )
+
+            if (self.path == '/'):
+                fp = open( "index.html" )
+            else:
+                fp = open( self.path[1:] )
+            page = fp.read()
+            fp.close()
+
+            # create and send headers
+            self.send_header( "Content-length", len(page) )
             self.end_headers()
 
-            self.wfile.write( bytes( web_form, "utf-8" ) )
+            # send the contents
+            self.wfile.write( bytes( page, "utf-8" ) )
 
+        elif self.path == "/styles.css":
+            self.send_response( 200 ); # OK
+
+            self.send_header( "Content-type", "text/css" )
+
+            fp = open( "styles.css" )
+            page = fp.read()
+            fp.close()
+
+            # create and send headers
+            self.send_header( "Content-length", len(page) )
+            self.end_headers()
+
+            # send the contents
+            self.wfile.write( bytes( page, "utf-8" ) )
+
+        elif self.path == "/script.js":
+            self.send_response( 200 ); # OK
+
+            self.send_header( "Content-type", "text/javascript" )
+
+            fp = open( "script.js" )
+            page = fp.read()
+            fp.close()
+
+            # create and send headers
+            self.send_header( "Content-length", len(page) )
+            self.end_headers()
+
+            # send the contents
+            self.wfile.write( bytes( page, "utf-8" ) )
+
+        elif self.path == "/Or_Brener.jpg":
+            self.send_response( 200 ); # OK
+            self.send_header( "Content-type", "image/jpg" )
+
+            fp = open( "Or_Brener.jpg",'rb' )
+            page = fp.read()
+            fp.close()
+
+            # create and send headers
+            self.send_header( "Content-length", len(page) )
+            self.end_headers()
+
+            # send the contents
+            self.wfile.write( page )
+        
         else:
             self.send_response( 404 ) # Error
             self.end_headers()
             self.wfile.write( bytes( "404: not found", "utf-8" ) )
         
     def do_POST( self ):
-        if self.path == "/molecule":
+
+        if self.path == "/uploadSDF":
+
+            form = cgi.FieldStorage(
+                fp = self.rfile,
+                headers = self.headers,
+                environ = {"REQUEST_METHOD":"POST"}
+            )
+
+            fileItem = form["file"]
+            molName = form.getvalue("name")
+
+            # read file in
+            fileContent = fileItem.file.read()
+
+            # convert to text
+            bytesIO = io.BytesIO(fileContent)
+            fileData = io.TextIOWrapper(bytesIO)
+
+            db.add_molecule(molName, fileData)
+
+            # print("\n\nMolecules")
+            # print( db.conn.execute( "SELECT * FROM Molecules;" ).fetchall() )
+
+             
             self.send_response( 200 ); # OK
-
-            # get the sdf file from the form (then convert to text)
-            bytesSDFFile = io.BytesIO(self.rfile.read(int(self.headers['Content-Length'])))
-            textSDFFile = io.TextIOWrapper(bytesSDFFile)
-
-            # skip the first 4 non-necessary lines
-            for i in range(4):
-                textSDFFile.readline()
-
-            # parse and sort the molecule using the sdf 
-            molecule = MolDisplay.Molecule()
-            molecule.parse(textSDFFile)
-            molecule.sort()
-            # generate the svg of the molecule
-            svg = molecule.svg()
-
-            self.send_header( "Content-type", "image/svg+xml" )
-            self.send_header( "Content-length", len(svg) )
             self.end_headers()
 
-            self.wfile.write( bytes( svg, "utf-8" ) )
 
         else:
             self.send_response( 404 ) # Error
             self.end_headers()
             self.wfile.write( bytes( "404: not found", "utf-8" ) )
 
-web_form = """
-<html>
-    <head>
-        <title> File Upload </title>
-    </head>
-    <body>
-        <h1> File Upload </h1>
-        <form action="molecule" enctype="multipart/form-data" method="post">
-        <p>
-            <input type="file" id="sdf_file" name="filename"/>
-        </p>
-        <p>
-            <input type="submit" value="Upload"/>
-        </p>
-        </form>
-    </body>
-</html>
-"""
 
 # run the server
+
+db['Elements'] = ( 1, 'H', 'Hydrogen', 'FFFFFF', '050505', '020202', 25 )
+db['Elements'] = ( 6, 'C', 'Carbon', '808080', '010101', '000000', 40 )
+db['Elements'] = ( 7, 'N', 'Nitrogen', '0000FF', '000005', '000002', 40 )
+db['Elements'] = ( 8, 'O', 'Oxygen', 'FF0000', '050000', '020000', 40 )
+
 httpd = HTTPServer( ( 'localhost', int(sys.argv[1]) ), MyHandler )
 httpd.serve_forever()
