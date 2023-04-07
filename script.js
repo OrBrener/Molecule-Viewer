@@ -1,4 +1,9 @@
-/* javascript to accompany jquery.html */
+// Assignment: CIS*2750 W23 Assignment 4
+// Due Date: April 5 2023 EXTENSION OF 48 HOURS
+// Name: Or Brener
+// Student #: 1140102
+
+/* javascript to accompany html */
 
 $(document).ready( 
     /* this defines a function that gets called after the document is in memory */
@@ -83,7 +88,7 @@ $(document).ready(
             const form = new FormData()
             
             const elementCode = $("#deleteCodeInput option:selected").text()
-            
+
             form.append("elementCode", elementCode)
 
             $.ajax( {

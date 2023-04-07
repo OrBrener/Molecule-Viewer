@@ -29,9 +29,10 @@ class Atom():
         x = (self.atom.x * 100.0) + offsetx
         y = (self.atom.y * 100.0) + offsety
 
-        # get radius and color from the tables 
-        r = radius[self.atom.element]
-        color = element_name[self.atom.element]
+        # get radius and color from the tables
+        # added in default values 
+        r = radius.get(self.atom.element, 30)
+        color = element_name.get(self.atom.element, "default")
 
         # return svg string
         return ' <circle cx="%.2f" cy="%.2f" r="%d" fill="url(#%s)"/>\n' % (x, y, r, color)
