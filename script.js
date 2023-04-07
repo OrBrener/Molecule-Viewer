@@ -32,6 +32,10 @@ $(document).ready(
                  }
                 } );
             }
+            
         )
+        if($('#heading0').length){
+            $('#hidden').css('display', 'none');
+        }
     } );
   

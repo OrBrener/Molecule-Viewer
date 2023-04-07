@@ -59,3 +59,13 @@ nav {
 .radialGradients {
     max-height: 1px !important;
 }
+
+#hidden {
+    margin-top: 10% !important;
+    text-align: center;
+}
+
+/* .card-body, svg {
+   width: 1000px !important;
+   height: 1000px !important;
+} */
