@@ -55,3 +55,7 @@ nav {
     margin-left: 15% !important;
     width: 70% !important;
 }
+
+.radialGradients {
+    max-height: 1px !important;
+}

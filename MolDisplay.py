@@ -11,6 +11,8 @@ header = """<svg version="1.1" width="1000" height="1000" xmlns="http://www.w3.o
 footer = """</svg>"""
 offsetx = 500
 offsety = 500
+radius = {}
+element_name = {}
 
 class Atom():
 
